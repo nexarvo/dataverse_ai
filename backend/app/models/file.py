@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime
 
@@ -9,4 +9,4 @@ class FileInfo(BaseModel):
     type: str
     columns: List[str]
     row_count: int
-    uploaded_at: datetime = datetime.now() 
+    uploaded_at: str = Field(default_factory=lambda: datetime.now().isoformat()) 

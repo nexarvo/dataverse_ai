@@ -96,7 +96,7 @@ export function DataAnalysis({ file }: DataAnalysisProps) {
               className="min-h-[100px]"
             />
             <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Examples: &quot;Show me sales trends&quot;, &quot;What&apos;s
                 the average order value?&quot;, &quot;Top 10 customers&quot;
               </p>
@@ -120,26 +120,34 @@ export function DataAnalysis({ file }: DataAnalysisProps) {
       {/* Results */}
       {results.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Analysis Results</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Analysis Results
+          </h3>
           {results.map((result) => (
             <Card key={result.id}>
               <CardHeader>
-                <CardTitle className="text-lg">{result.question}</CardTitle>
-                <p className="text-sm text-gray-500">
+                <CardTitle className="text-lg text-gray-900 dark:text-white">
+                  {result.question}
+                </CardTitle>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {result.createdAt.toLocaleString()}
                 </p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-gray-700">{result.answer}</p>
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <p className="text-gray-700 dark:text-gray-300">
+                      {result.answer}
+                    </p>
                   </div>
 
                   {result.chart && (
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Chart Visualization</h4>
-                      <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
-                        <p className="text-gray-500">
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">
+                        Chart Visualization
+                      </h4>
+                      <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
+                        <p className="text-gray-500 dark:text-gray-400">
                           Chart placeholder - integrate with Chart.js or similar
                         </p>
                       </div>
@@ -148,15 +156,17 @@ export function DataAnalysis({ file }: DataAnalysisProps) {
 
                   {result.data.length > 0 && (
                     <div>
-                      <h4 className="font-medium mb-2">Data Table</h4>
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">
+                        Data Table
+                      </h4>
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-200">
+                        <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
                           <thead>
-                            <tr className="bg-gray-50">
+                            <tr className="bg-gray-50 dark:bg-gray-800">
                               {Object.keys(result.data[0]).map((key) => (
                                 <th
                                   key={key}
-                                  className="border border-gray-200 px-4 py-2 text-left"
+                                  className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-900 dark:text-white"
                                 >
                                   {key}
                                 </th>
@@ -165,11 +175,11 @@ export function DataAnalysis({ file }: DataAnalysisProps) {
                           </thead>
                           <tbody>
                             {result.data.map((row, index) => (
-                              <tr key={index}>
+                              <tr key={index} className="dark:bg-gray-900">
                                 {Object.values(row).map((value, cellIndex) => (
                                   <td
                                     key={cellIndex}
-                                    className="border border-gray-200 px-4 py-2"
+                                    className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white"
                                   >
                                     {String(value)}
                                   </td>

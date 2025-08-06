@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional
 import pandas as pd
-from ..api.upload import file_storage
 import uuid
 from datetime import datetime
+from ..api.upload import file_storage
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ class AnalysisResponse(BaseModel):
     answer: str
     data: List[Dict[str, Any]]
     chart: Optional[Dict[str, Any]] = None
-    created_at: datetime
+    created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 @router.post("/analyze")
 async def analyze_data(request: AnalysisRequest) -> JSONResponse:
@@ -95,8 +95,7 @@ async def analyze_data(request: AnalysisRequest) -> JSONResponse:
             question=request.question,
             answer=answer,
             data=result_data,
-            chart=chart_data,
-            created_at=datetime.now()
+            chart=chart_data
         )
         
         return JSONResponse(

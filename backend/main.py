@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
-from app.api import upload, analyze
+from app.api import upload, analyze, suggestions
 
 app = FastAPI(
     title="Dataverse.ai API",
@@ -22,6 +22,7 @@ app.add_middleware(
 # Include API routes
 app.include_router(upload.router, prefix="/api/v1", tags=["upload"])
 app.include_router(analyze.router, prefix="/api/v1", tags=["analyze"])
+app.include_router(suggestions.router, prefix="/api/v1", tags=["suggestions"])
 
 @app.get("/")
 async def root():

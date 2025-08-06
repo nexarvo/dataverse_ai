@@ -28,23 +28,43 @@ export function FileUpload({
       setIsUploading(true);
 
       try {
-        // Simulate file upload - replace with actual API call
-        const mockFile: DataFile = {
-          id: Date.now().toString(),
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          uploadedAt: new Date(),
-          columns: ["Column 1", "Column 2", "Column 3"], // Mock data
-          rowCount: 1000,
-        };
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("file", file);
 
-        // Simulate upload delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Upload file to backend
+        const response = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/api/v1/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-        onFileUpload(mockFile);
+        const data = await response.json();
+
+        if (response.ok && data.success && data.data) {
+          // Convert backend response to frontend DataFile format
+          const uploadedFile: DataFile = {
+            id: data.data.id,
+            name: data.data.name,
+            size: data.data.size,
+            type: data.data.type,
+            uploadedAt: new Date(data.data.uploaded_at || Date.now()),
+            columns: data.data.columns || [],
+            rowCount: data.data.row_count || 0,
+          };
+
+          onFileUpload(uploadedFile);
+        } else {
+          console.error("Upload failed:", data.detail || "Unknown error");
+          throw new Error(data.detail || "Upload failed");
+        }
       } catch (error) {
         console.error("Upload failed:", error);
+        // You might want to show an error message to the user here
       } finally {
         setIsUploading(false);
       }
@@ -72,8 +92,10 @@ export function FileUpload({
             <div className="flex items-center space-x-3">
               <FileText className="h-8 w-8 text-blue-500" />
               <div>
-                <h3 className="font-semibold">{uploadedFile.name}</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  {uploadedFile.name}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {uploadedFile.rowCount.toLocaleString()} rows •{" "}
                   {uploadedFile.columns.length} columns
                 </p>
@@ -100,26 +122,30 @@ export function FileUpload({
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
             isDragActive
-              ? "border-blue-500 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+              : "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500"
           }`}
         >
           <input {...getInputProps()} />
           <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           {isUploading ? (
             <div>
-              <p className="text-lg font-medium">Uploading...</p>
-              <p className="text-sm text-gray-500">Please wait</p>
+              <p className="text-lg font-medium text-gray-900 dark:text-white">
+                Uploading...
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Please wait
+              </p>
             </div>
           ) : (
             <div>
-              <p className="text-lg font-medium">
+              <p className="text-lg font-medium text-gray-900 dark:text-white">
                 {isDragActive ? "Drop your file here" : "Upload your CSV file"}
               </p>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 Drag and drop a CSV file here, or click to select
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 Supports CSV, Excel files up to 50MB
               </p>
             </div>
