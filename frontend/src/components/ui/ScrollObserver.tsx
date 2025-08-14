@@ -10,7 +10,10 @@ import React, {
 import { clsx } from "clsx";
 
 interface ScrollObserverContextType {
-  registerTrigger: (id: string, ref: React.RefObject<HTMLElement>) => void;
+  registerTrigger: (
+    id: string,
+    ref: React.RefObject<HTMLElement | null>
+  ) => void;
   unregisterTrigger: (id: string) => void;
   activeTrigger: string | null;
   activeIndex: number | null;
@@ -31,9 +34,14 @@ export function ScrollObserver({
   const [activeTrigger, setActiveTrigger] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isHidden, setIsHidden] = useState(false);
-  const triggers = useRef<Map<string, React.RefObject<HTMLElement>>>(new Map());
+  const triggers = useRef<Map<string, React.RefObject<HTMLElement | null>>>(
+    new Map()
+  );
 
-  const registerTrigger = (id: string, ref: React.RefObject<HTMLElement>) => {
+  const registerTrigger = (
+    id: string,
+    ref: React.RefObject<HTMLElement | null>
+  ) => {
     console.log("Registering trigger:", id);
     triggers.current.set(id, ref);
   };
@@ -80,8 +88,8 @@ export function ScrollObserver({
       setActiveTrigger(newActiveTrigger);
 
       // Set active index based on trigger id
-      if (newActiveTrigger) {
-        const indexMatch = newActiveTrigger.match(/features-(\d+)/);
+      if (newActiveTrigger && typeof newActiveTrigger === "string") {
+        const indexMatch = (newActiveTrigger as string).match(/features-(\d+)/);
         if (indexMatch) {
           const newIndex = parseInt(indexMatch[1]);
           console.log("Setting active index to:", newIndex);

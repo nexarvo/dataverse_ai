@@ -2,7 +2,38 @@
 
 import { PulseBeams } from "@/components/ui/pulse-beams";
 
-const beams = [
+interface BeamPath {
+  path: string;
+  gradientConfig: {
+    initial: {
+      x1: string;
+      x2: string;
+      y1: string;
+      y2: string;
+    };
+    animate: {
+      x1: string | string[];
+      x2: string | string[];
+      y1: string | string[];
+      y2: string | string[];
+    };
+    transition?: {
+      duration?: number;
+      repeat?: number;
+      repeatType?: "loop" | "reverse" | "mirror";
+      ease?: "linear" | "easeIn" | "easeOut" | "easeInOut";
+      repeatDelay?: number;
+      delay?: number;
+    };
+  };
+  connectionPoints?: Array<{
+    cx: number;
+    cy: number;
+    r: number;
+  }>;
+}
+
+const beams: BeamPath[] = [
   {
     path: "M269 220.5H16.5C10.9772 220.5 6.5 224.977 6.5 230.5V398.5",
     gradientConfig: {

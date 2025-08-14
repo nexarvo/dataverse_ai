@@ -1,38 +1,20 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useMotionValueEvent, useScroll } from "framer-motion";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import {
-  Upload,
-  FileText,
-  CheckCircle,
-  TrendingUp,
-  BarChart3,
-} from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { DataQuestionInput } from "./DataQuestionInput";
-import DisplayCards from "./DisplayCards";
-import { DataChart } from "./DataChart";
-import { DataTable } from "./DataTable";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,

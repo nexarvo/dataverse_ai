@@ -1,68 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { Hero2 } from "@/components/ui/hero-2-1";
 import { FeatureCard } from "@/components/ui/grid-feature-cards";
 import { DataTools } from "@/components/ui/DataTools";
 import { HowItWorks } from "@/components/ui/HowItWorks";
 import { Footer7 } from "@/components/ui/Footer7";
 import { PulseBeamsFirstDemo } from "@/components/ui/pulse-beams-demo";
-import {
-  Clock,
-  Database,
-  Users,
-  Link,
-  MessageSquare,
-  BarChart3,
-  ArrowRight,
-  Calendar,
-  Mail,
-  Zap,
-  TrendingUp,
-  Shield,
-  Brain,
-  Target,
-  Sparkles,
-} from "lucide-react";
-
-// Mockup images - these would be replaced with actual images
-const mockupImages = {
-  saas: "/images/mockup_saas.svg",
-  ecommerce: "/images/mockup_ecommerce.svg",
-  fintech: "/images/mockup_fintech.svg",
-  healthcare: "/images/mockup_healthcare.svg",
-  logistics: "/images/mockup_logistics.svg",
-};
-
-const useCases = [
-  {
-    image: mockupImages.saas,
-    title: "For SaaS",
-    description: "Track MRR and churn instantly",
-  },
-  {
-    image: mockupImages.ecommerce,
-    title: "For E-commerce",
-    description: "Monitor sales and inventory in real-time",
-  },
-  {
-    image: mockupImages.fintech,
-    title: "For Fintech",
-    description: "Analyze transaction patterns and fraud",
-  },
-  {
-    image: mockupImages.healthcare,
-    title: "For Healthcare",
-    description: "Track patient outcomes and resource utilization",
-  },
-  {
-    image: mockupImages.logistics,
-    title: "For Logistics",
-    description: "Optimize routes and delivery performance",
-  },
-];
+import { Zap, TrendingUp, Shield, Brain, Target, Sparkles } from "lucide-react";
 
 const features = [
   {
@@ -98,10 +43,6 @@ const features = [
 ];
 
 export function LandingPage() {
-  const scrollToSection = (sectionId: string) => {
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell } from "recharts";
+
 import { cn } from "@/lib/utils";
 
 export type ChartConfig = Record<
@@ -43,9 +43,14 @@ export function ChartContainer({
 
 interface ChartTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: Array<{
+    color?: string;
+    name?: string;
+    value?: string | number;
+    payload?: Record<string, unknown>;
+  }>;
   label?: string;
-  cursor?: boolean | any;
+  cursor?: boolean | unknown;
   children?: React.ReactNode;
   content?: React.ReactNode;
 }
@@ -70,7 +75,12 @@ export function ChartTooltip({
 }
 
 interface ChartTooltipContentProps {
-  payload?: any[];
+  payload?: Array<{
+    color?: string;
+    name?: string;
+    value?: string | number;
+    payload?: Record<string, unknown>;
+  }>;
   label?: string;
   indicator?: "line" | "bar";
   nameKey?: string;
@@ -103,7 +113,7 @@ export function ChartTooltipContent({
           </div>
         </div>
       )}
-      {payload.map((item: any, index: number) => (
+      {payload.map((item, index: number) => (
         <div key={index} className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div
@@ -113,7 +123,7 @@ export function ChartTooltipContent({
               }}
             />
             <span className="text-sm text-muted-foreground">
-              {nameKey ? item.payload[nameKey] : item.name}
+              {nameKey ? String(item.payload?.[nameKey] || "") : item.name}
             </span>
           </div>
           <span className="text-sm font-medium">{item.value}</span>

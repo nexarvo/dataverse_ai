@@ -29,36 +29,21 @@ export function DataAnalysis({ file }: DataAnalysisProps) {
       const mockResult: AnalysisResult = {
         id: Date.now().toString(),
         question: question,
-        answer: `Based on the analysis of your ${file.name} file, here are the key insights...`,
-        data: [
-          { category: "Category A", value: 150 },
-          { category: "Category B", value: 200 },
-          { category: "Category C", value: 100 },
-        ],
-        chart: {
-          type: "bar",
-          data: {
-            labels: ["Category A", "Category B", "Category C"],
-            datasets: [
-              {
-                label: "Values",
-                data: [150, 200, 100],
-                backgroundColor: ["#3B82F6", "#10B981", "#F59E0B"],
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: "top" as const,
-              },
-              title: {
-                display: true,
-                text: "Analysis Results",
-              },
-            },
-          },
+        code: `# Analysis of ${file.name}\n# This is a sample analysis code`,
+        language: "python",
+        explanation: `Based on the analysis of your ${file.name} file, here are the key insights...`,
+        executed: true,
+        output: "Analysis completed successfully",
+        result: {
+          tables: [],
+          charts: [],
+          summary: "Sample analysis summary",
+        },
+        data_analysis: {
+          total_rows: 1000,
+          total_columns: 5,
+          numeric_columns: ["col1", "col2"],
+          categorical_columns: ["col3", "col4", "col5"],
         },
         createdAt: new Date(),
       };
@@ -135,60 +120,81 @@ export function DataAnalysis({ file }: DataAnalysisProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {result.answer}
-                    </p>
-                  </div>
-
-                  {result.chart && (
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">
-                        Chart Visualization
-                      </h4>
-                      <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
-                        <p className="text-gray-500 dark:text-gray-400">
-                          Chart placeholder - integrate with Chart.js or similar
-                        </p>
-                      </div>
+                  {result.explanation && (
+                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                      <p className="text-gray-700 dark:text-gray-300">
+                        {result.explanation}
+                      </p>
                     </div>
                   )}
 
-                  {result.data.length > 0 && (
+                  {result.code && (
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">
+                        Analysis Code
+                      </h4>
+                      <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto">
+                        <code>{result.code}</code>
+                      </pre>
+                    </div>
+                  )}
+
+                  {result.output && (
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">
+                        Output
+                      </h4>
+                      <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto">
+                        {result.output}
+                      </pre>
+                    </div>
+                  )}
+
+                  {result.result?.tables && result.result.tables.length > 0 && (
                     <div>
                       <h4 className="font-medium mb-2 text-gray-900 dark:text-white">
-                        Data Table
+                        Data Tables
                       </h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
-                          <thead>
-                            <tr className="bg-gray-50 dark:bg-gray-800">
-                              {Object.keys(result.data[0]).map((key) => (
-                                <th
-                                  key={key}
-                                  className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-900 dark:text-white"
-                                >
-                                  {key}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {result.data.map((row, index) => (
-                              <tr key={index} className="dark:bg-gray-900">
-                                {Object.values(row).map((value, cellIndex) => (
-                                  <td
-                                    key={cellIndex}
-                                    className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                      {result.result.tables.map((table, index) => (
+                        <div key={index} className="mb-4">
+                          <h5 className="font-medium mb-2 text-gray-700 dark:text-gray-300">
+                            {table.title}
+                          </h5>
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
+                              <thead>
+                                <tr className="bg-gray-50 dark:bg-gray-800">
+                                  {table.headers.map((header) => (
+                                    <th
+                                      key={header}
+                                      className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-900 dark:text-white"
+                                    >
+                                      {header}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {table.rows.map((row, rowIndex) => (
+                                  <tr
+                                    key={rowIndex}
+                                    className="dark:bg-gray-900"
                                   >
-                                    {String(value)}
-                                  </td>
+                                    {row.map((cell, cellIndex) => (
+                                      <td
+                                        key={cellIndex}
+                                        className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                                      >
+                                        {cell}
+                                      </td>
+                                    ))}
+                                  </tr>
                                 ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

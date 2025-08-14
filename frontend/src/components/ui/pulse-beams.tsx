@@ -22,8 +22,8 @@ interface BeamPath {
     transition?: {
       duration?: number;
       repeat?: number;
-      repeatType?: string;
-      ease?: string;
+      repeatType?: "loop" | "reverse" | "mirror";
+      ease?: "linear" | "easeIn" | "easeOut" | "easeInOut";
       repeatDelay?: number;
       delay?: number;
     };
@@ -92,6 +92,13 @@ const SVGs = ({
   baseColor,
   accentColor,
   gradientColors,
+}: {
+  beams: BeamPath[];
+  width: number;
+  height: number;
+  baseColor: string;
+  accentColor: string;
+  gradientColors?: { start: string; middle: string; end: string };
 }) => {
   return (
     <svg
@@ -148,6 +155,8 @@ const GradientColors = ({
     middle: "#6344F5",
     end: "#AE48FF",
   },
+}: {
+  colors?: { start: string; middle: string; end: string };
 }) => {
   return (
     <>

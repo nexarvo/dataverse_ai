@@ -184,13 +184,17 @@ export function AnalysisResult({ result }: AnalysisResultProps) {
               <div>
                 <p className="text-gray-500 dark:text-gray-400">Rows</p>
                 <p className="font-semibold text-gray-900 dark:text-white">
-                  {result.data_analysis.total_rows?.toLocaleString() || "0"}
+                  {typeof result.data_analysis.total_rows === "number"
+                    ? result.data_analysis.total_rows.toLocaleString()
+                    : "0"}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500 dark:text-gray-400">Columns</p>
                 <p className="font-semibold text-gray-900 dark:text-white">
-                  {result.data_analysis.total_columns || "0"}
+                  {typeof result.data_analysis.total_columns === "number"
+                    ? result.data_analysis.total_columns
+                    : "0"}
                 </p>
               </div>
               <div>

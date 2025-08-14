@@ -102,7 +102,7 @@ function VSCodeBlock({ code }: { code: string }) {
 
 export function ChatMessage({ result }: ChatMessageProps) {
   const charts = useMemo(() => {
-    const list = (result.result as any)?.charts;
+    const list = (result.result as { charts?: unknown })?.charts;
     if (!list) return [] as string[];
     if (Array.isArray(list)) {
       return list.filter((c) => typeof c === "string") as string[];
