@@ -1,11 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Sparkles } from "lucide-react";
-import { apiClient } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import type { DataFile, AnalysisResult } from "@/types";
+import { AnalysisResult as AnalysisResultComponent } from "./AnalysisResult";
+
+interface QuestionSuggestionsProps {
+  uploadedFile: DataFile | null;
+}
 
 interface Category {
   name: string;
@@ -18,52 +23,46 @@ interface QuestionSuggestion {
   description: string;
 }
 
-interface SuggestionsData {
+interface SuggestionsResponse {
   category: Category;
   questions: QuestionSuggestion[];
   data_analysis: Record<string, unknown>;
 }
 
-interface QuestionSuggestionsProps {
-  fileId: string;
-  onQuestionSelect: (question: string) => void;
-}
-
 export function QuestionSuggestions({
-  fileId,
-  onQuestionSelect,
-}: QuestionSuggestionsProps) {
-  const [categories, setCategories] = useState<Record<string, Category>>({});
+  uploadedFile,
+  onPick,
+}: QuestionSuggestionsProps & { onPick?: (question: string) => void }) {
+  const [categories, setCategories] = useState<Record<string, Category> | null>(
+    null
+  );
+  const [suggestions, setSuggestions] = useState<SuggestionsResponse | null>(
+    null
+  );
   const [selectedCategory, setSelectedCategory] = useState<string>("learn");
-  const [suggestions, setSuggestions] = useState<SuggestionsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
+    null
+  );
+  const [analyzing, setAnalyzing] = useState(false);
 
-  // Debug logging
-  console.log("QuestionSuggestions render:", {
-    fileId,
-    categoriesLoading,
-    loading,
-    error,
-    suggestions: !!suggestions,
-    categoriesCount: Object.keys(categories).length,
-    selectedCategory,
-  });
+  const fileId = uploadedFile?.id;
 
-  // Fetch categories on mount
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Fetch suggestions when category changes
-  useEffect(() => {
-    if (fileId && fileId.trim() !== "" && selectedCategory) {
-      fetchSuggestions();
-    } else if (fileId && fileId.trim() !== "") {
-      // Reset suggestions when fileId changes but no category is selected
+    if (fileId) {
       setSuggestions(null);
-      setError(null);
+      setAnalysisResult(null);
+      setSelectedQuestion(null);
+      fetchCategories();
+    }
+  }, [fileId]);
+
+  useEffect(() => {
+    if (fileId && selectedCategory) {
+      fetchSuggestions();
     }
   }, [fileId, selectedCategory]);
 
@@ -77,7 +76,7 @@ export function QuestionSuggestions({
         }/api/v1/categories`
       );
       const data = await response.json();
-      console.log("Categories API response:", data);
+
       if (data.success && data.data) {
         setCategories(data.data);
       } else {
@@ -92,6 +91,8 @@ export function QuestionSuggestions({
   };
 
   const fetchSuggestions = async () => {
+    if (!fileId) return;
+
     setLoading(true);
     setError(null);
     try {
@@ -112,14 +113,10 @@ export function QuestionSuggestions({
       );
 
       const data = await response.json();
-      console.log("Suggestions API response:", data);
+
       if (response.ok && data.success && data.data) {
         setSuggestions(data.data);
       } else {
-        console.error(
-          "Failed to fetch suggestions:",
-          data.detail || "Unknown error"
-        );
         setError(data.detail || "Failed to load suggestions");
         setSuggestions(null);
       }
@@ -132,94 +129,144 @@ export function QuestionSuggestions({
     }
   };
 
-  const handleCategorySelect = (categoryKey: string) => {
-    setSelectedCategory(categoryKey);
+  const handleQuestionClick = async (question: string) => {
+    if (!fileId) return;
+
+    setSelectedQuestion(question);
+    onPick?.(question);
+    setAnalyzing(true);
+    setAnalysisResult(null);
+
+    try {
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/v1/analyze`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file_id: fileId,
+            question: question,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success && data.data) {
+        setAnalysisResult({
+          ...data.data,
+          createdAt: new Date(data.data.created_at),
+        });
+      } else {
+        setError(data.detail || "Failed to analyze question");
+      }
+    } catch (error) {
+      console.error("Failed to analyze question:", error);
+      setError("Failed to analyze question");
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
-  const handleQuestionClick = (question: string) => {
-    onQuestionSelect(question);
-  };
-
-  // Show loading state for categories
   if (categoriesLoading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-          <p className="text-gray-500 dark:text-gray-400">
-            Loading categories...
-          </p>
-        </div>
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Loading categories...</span>
       </div>
     );
   }
 
-  // Show categories and loading state for suggestions
+  if (error && !suggestions) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+        <Button onClick={fetchCategories} variant="outline">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   if (!suggestions) {
     return (
-      <div className="space-y-6">
-        {/* Category Selector */}
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(categories).map(([key, category]) => (
-            <Button
-              key={key}
-              variant={selectedCategory === key ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleCategorySelect(key)}
-              className="flex items-center space-x-2"
-            >
-              <span>{category.name}</span>
-            </Button>
-          ))}
-        </div>
-
-        {/* Loading state for suggestions */}
-        <div className="flex items-center justify-center py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-            <p className="text-gray-500 dark:text-gray-400">
-              Loading suggestions...
-            </p>
-          </div>
-        </div>
+      <div className="text-center p-8">
+        <p className="text-gray-600 dark:text-gray-400">
+          Please upload a file to get started
+        </p>
       </div>
     );
   }
 
-  // Show content when suggestions are available
   return (
     <div className="space-y-6">
-      {/* Category Selector */}
-      <div className="flex flex-wrap gap-2 justify-start items-center max-w-2xl mx-auto">
-        {Object.entries(categories).map(([key, category]) => (
-          <Button
-            key={key}
-            variant={selectedCategory === key ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleCategorySelect(key)}
-            className="flex items-center space-x-2"
-          >
-            <span>{category.name}</span>
-          </Button>
-        ))}
+      {/* Categories */}
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-md p-4">
+        <h2 className="text-lg font-semibold mb-4">Choose a category:</h2>
+        <div className="flex flex-wrap gap-3 justify-start">
+          {categories &&
+            Object.entries(categories).map(([key, category]) => (
+              <Button
+                key={key}
+                variant={selectedCategory === key ? "default" : "outline"}
+                onClick={() => setSelectedCategory(key)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-full ${
+                  selectedCategory === key
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                <span className="whitespace-nowrap">{category.name}</span>
+              </Button>
+            ))}
+        </div>
       </div>
 
-      {/* Questions in Horizontal Rows */}
-      <div className="space-y-3 max-w-2xl mx-auto">
-        {suggestions.questions.map((question, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-start px-4 py-3 cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:rounded-lg"
-            onClick={() => handleQuestionClick(question.question)}
-          >
-            <div className="flex-1">
-              <p className="font-medium text-gray-900 dark:text-white text-left">
-                {question.question}
-              </p>
-            </div>
+      {/* Questions */}
+      <div className="max-w-2xl mx-auto">
+        {loading ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="ml-2">Generating questions...</span>
           </div>
-        ))}
+        ) : (
+          <div className="space-y-3">
+            {suggestions.questions.map((question, index) => (
+              <div
+                key={index}
+                className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                  selectedQuestion === question.question
+                    ? "bg-gray-100 dark:bg-gray-800 border-gray-300"
+                    : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                }`}
+                onClick={() => handleQuestionClick(question.question)}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900 dark:text-white text-left">
+                      {question.question}
+                    </p>
+                  </div>
+                  {selectedQuestion === question.question && analyzing && (
+                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Analysis Result */}
+      {analysisResult && (
+        <div className="mt-8">
+          <AnalysisResultComponent result={analysisResult} />
+        </div>
+      )}
     </div>
   );
 }

@@ -162,9 +162,9 @@ function SidebarContent({
             sessions.map((session) => (
               <div key={session.id}>
                 <div
-                  className={`group relative flex items-center space-x-3 rounded-lg p-3 cursor-pointer transition-colors ${
+                  className={`group relative flex items-center space-x-3 rounded-md p-2 cursor-pointer transition-colors ${
                     currentSessionId === session.id
-                      ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+                      ? "bg-gray-100 dark:bg-gray-800/40"
                       : "hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                   onClick={() => onSessionSelect(session.id)}
@@ -172,9 +172,9 @@ function SidebarContent({
                   {/* File Icon */}
                   <div className="flex-shrink-0">
                     {session.file ? (
-                      <FileText className="h-5 w-5 text-blue-500" />
+                      <FileText className="h-4 w-4 text-gray-500" />
                     ) : (
-                      <MessageSquare className="h-5 w-5 text-gray-400" />
+                      <MessageSquare className="h-4 w-4 text-gray-400" />
                     )}
                   </div>
 
@@ -183,7 +183,7 @@ function SidebarContent({
                     <p
                       className={`text-sm font-medium truncate ${
                         currentSessionId === session.id
-                          ? "text-blue-700 dark:text-blue-300"
+                          ? "text-gray-900 dark:text-white"
                           : "text-gray-900 dark:text-white"
                       }`}
                     >
@@ -234,14 +234,6 @@ function SidebarContent({
           )}
         </div>
       </ScrollArea>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <Button variant="outline" className="w-full justify-start" size="sm">
-          <Settings className="h-4 w-4 mr-2" />
-          Settings
-        </Button>
-      </div>
     </div>
   );
 }

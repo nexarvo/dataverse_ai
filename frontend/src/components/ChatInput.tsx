@@ -93,25 +93,29 @@ export function ChatInput({
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4">
       <div className="max-w-4xl mx-auto">
-        {/* File Upload Status */}
+        {/* File Upload Status (compact chip in chat header) */}
         {uploadedFile && (
-          <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Upload className="h-4 w-4 text-blue-500" />
-                <span className="text-sm text-blue-700 dark:text-blue-300">
-                  {uploadedFile.name} ({uploadedFile.rowCount.toLocaleString()}{" "}
-                  rows)
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
+          <div className="mb-2">
+            <div
+              className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 text-sm px-3 py-1 max-w-xs w-auto break-words"
+              style={{ maxWidth: "360px" }}
+              title={`${
+                uploadedFile.name
+              } • ${uploadedFile.rowCount.toLocaleString()} rows`}
+            >
+              <Upload className="h-3 w-3 mr-1" />
+              <span className="truncate">{uploadedFile.name}</span>
+              <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                {uploadedFile.rowCount.toLocaleString()} rows
+              </span>
+              <button
+                type="button"
+                aria-label="Remove file"
                 onClick={onFileRemove}
-                className="h-6 w-6 p-0 text-blue-500 hover:text-blue-700"
+                className="ml-2 text-xs text-red-500 hover:text-red-700"
               >
-                <X className="h-3 w-3" />
-              </Button>
+                ×
+              </button>
             </div>
           </div>
         )}

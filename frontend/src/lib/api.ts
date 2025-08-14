@@ -62,6 +62,16 @@ class ApiClient {
     });
   }
 
+  async analyzeCustomQuestion(
+    fileId: string,
+    question: string
+  ): Promise<ApiResponse<AnalysisResult>> {
+    return this.request<AnalysisResult>("/api/v1/analyze/custom", {
+      method: "POST",
+      body: JSON.stringify({ fileId, question }),
+    });
+  }
+
   async getFileInfo(fileId: string): Promise<ApiResponse<DataFile>> {
     return this.request<DataFile>(`/api/v1/files/${fileId}`);
   }
