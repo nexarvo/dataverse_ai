@@ -1,27 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ArrowRight,
-  Menu,
-  X,
-  Database,
-  BarChart3,
-  MessageSquare,
-  Zap,
-  TrendingUp,
-  Shield,
-} from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { FeatureCard } from "./grid-feature-cards";
 import { AI_Prompt } from "./animated-ai-input";
 
 const Hero2 = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const scrollToSection = (sectionId: string) => {
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">

@@ -69,6 +69,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.shadcnblocks.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
