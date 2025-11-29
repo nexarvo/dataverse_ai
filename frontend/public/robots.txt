@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Sitemap: https://dataverse.ai/sitemap.xml
+Host: https://dataverse.ai
+
